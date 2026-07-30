@@ -1,4 +1,5 @@
 import httpx
+import re
 from src.utils import setup_logger
 from config.settings import HTTP_TIMEOUT, CHUNK_SIZE
 
@@ -27,10 +28,13 @@ class CKANSearcher:
             for pkg in packages:
                 url = pkg.get("url", "")
                 name = pkg.get("name", "sin_nombre").lower()
-                # Regla de selección: Solo archivos CSV que contengan 'nacimientos'
-                if url.endswith(".csv") and "nacimiento" in name.lower():
-                    clean_name = f"{name.strip().replace(' ', '_')}.csv"
-                    selected_resources[clean_name] = url
+                # Regla de selección: Solo archivos CSV que contengan 'nacimientos' dentro del rango 2013 - 2023
+                match = re.search(r"(\d{4})", pkg["name"])
+                if match:
+                    year = int(match.group(1))
+                    if 2013 <= year <= 2023 and url.endswith(".csv") and "nacimiento" in name:
+                        clean_name = f"{name.strip().replace(' ', '_')}"
+                        selected_resources[clean_name] = url
 
             logger.info(f"Se seleccionaron {len(selected_resources)} datasets de la búsqueda.")
             logger.info(f"Recursos seleccionados:")
