@@ -1,0 +1,25 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Caché de Python
+__pycache__/
+*.pyc
+
+# Datos del Pipeline
+data/bronze/*
+data/silver/*
+data/gold/*
+!data/bronze/.gitkeep
+!data/silver/.gitkeep
+!data/gold/.gitkeep
+
+# Llaves de API y variables de entorno
+.env
+*.pem
+
+# Archivos de configuración de IDEs / OS
+.vscode/
+.idea/
+.DS_Store
