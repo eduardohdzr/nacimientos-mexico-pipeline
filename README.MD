@@ -36,12 +36,14 @@ nacimientos-mexico/
 │   ├── silver/             # Datasets limpios y filtrados por año (Parquet)
 │   └── gold/               # Dataset consolidado final listo para producción
 ├── config/
-│   └── settings.py         # Configuración global (URLs, rutas locales, timeouts)
+│   └── settings.py         # Configuración global (URLs, rutas locales, timeouts, etc)
 ├── src/
 │   ├── dataset_search.py   # Consulta a la API y filtrado dinámico de recursos
+│   ├── downloader.py       # Cliente HTTP para la descarga de archivos
+│   ├── run_bronze.py       # Orquestador del pipeline de la Capa Bronze
 │   └── utils.py            # Funciones auxiliares (manejo de logs, métricas, etc.)
 ├── .gitignore              # Archivos omitidos en Git (data/, .venv/, .env, etc.)
-├── main.py                 # Orquestador y punto de entrada del pipeline
+├── main.py                 # Orquestador principal y punto de entrada de la aplicación
 ├── requirements.txt        # Dependencias del proyecto
 └── README.md               # Documentación del proyecto
 ```
