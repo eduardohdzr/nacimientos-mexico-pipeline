@@ -35,7 +35,7 @@ class CKANSearcher:
                         clean_name = f"{name.strip().replace(' ', '_')}{FILE_NAME_EXTENSION}"
                         selected_resources[clean_name] = url
 
-            logger.info(f"Se encontraron {len(selected_resources)} datasets de la búsqueda.")
+            logger.info(f"Se encontraron {len(selected_resources)} datasets.")
             #logger.info(f"Recursos seleccionados:")
             return selected_resources
 
