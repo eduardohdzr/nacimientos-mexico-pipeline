@@ -13,21 +13,23 @@ class FileDownloader:
 
     def download(self, url: str, output_path: Path) -> None:
         """Descarga un archivo por bloques (Streaming). Idempotente."""
-        if output_path.exists():
-            logger.info(f"El archivo '{output_path.name}' ya existe. Omitiendo.")
+
+        #logger.info(f"Verificando existencia de archivos...")
+        if not output_path.exists():
+            logger.info(f"El archivo '{output_path.name}' no existe. Iniciando descarga.")
+            try:
+                        with httpx.stream("GET", url, verify=self.verify_ssl, follow_redirects=True, timeout=60.0) as resp:
+                            resp.raise_for_status()
+                            with open(output_path, "wb") as f:
+                                for chunk in resp.iter_bytes(chunk_size=self.chunk_size):
+                                    f.write(chunk)
+                        logger.info(f"Descarga finalizada: {output_path.name}")
+            
+            except Exception as e:
+                        logger.error(f"Error al descargar {output_path.name}: {e}")
+                        if output_path.exists():
+                            output_path.unlink()  # Limpiar archivo corrupto si falla
+                        raise
+        else:
+            #logger.info(f"El archivo '{output_path.name}' ya existe. Omitiendo.")
             return
-
-        logger.info(f"Iniciando descarga: {output_path.name}")
-        try:
-            with httpx.stream("GET", url, verify=self.verify_ssl, follow_redirects=True, timeout=60.0) as resp:
-                resp.raise_for_status()
-                with open(output_path, "wb") as f:
-                    for chunk in resp.iter_bytes(chunk_size=self.chunk_size):
-                        f.write(chunk)
-            logger.info(f"Descarga finalizada: {output_path.name}")
-
-        except Exception as e:
-            logger.error(f"Error al descargar {output_path.name}: {e}")
-            if output_path.exists():
-                output_path.unlink()  # Limpiar archivo corrupto si falla
-            raise

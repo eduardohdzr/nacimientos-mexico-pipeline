@@ -1,27 +1,18 @@
-from pathlib import Path
-from config.settings import API_ENDPOINT, QUERY
-from src.dataset_search import CKANSearcher
-from src.downloader import FileDownloader
+from config.settings import BRONZE_DIR, TOTAL_FILES_EXPECTED, FILE_NAME_EXTENSION
 from src.utils import setup_logger
-logger = setup_logger("BronzePipeline")
+from src.run_bronze import run_bronze_pipeline
 
-BRONZE_DIR = Path("data/bronze")
 
-def run_bronze_pipeline():
-    BRONZE_DIR.mkdir(parents=True, exist_ok=True)
+logger = setup_logger("Main")
 
-    # Paso 1: Buscar y seleccionar
-    searcher = CKANSearcher(API_ENDPOINT)
-    target_files = searcher.search_datasets(QUERY)
+def main():
 
-    # Paso 2: Descargar los seleccionados
-    downloader = FileDownloader(verify_ssl=False)
-    for file_name, url in target_files.items():
-        destination = BRONZE_DIR / file_name
-        downloader.download(url=url, output_path=destination)
-
-    logger.info("=== FASE 1 (CAPA BRONZE) COMPLETADA CON ÉXITO ===")
-
+    # 1. ORQUESTACIÓN FASE 1 (BRONZE)
+    if len(list(BRONZE_DIR.glob(f"*{FILE_NAME_EXTENSION}"))) < TOTAL_FILES_EXPECTED:
+        run_bronze_pipeline()
+    else:
+        logger.info("Capa Bronze completa. Saltando búsqueda y descarga.")
+        
+        
 if __name__ == "__main__":
-    logger.info("=== INICIANDO PIPELINE DE DESCARGA DE DATOS BRONZE ===")
-    run_bronze_pipeline()
+    main()

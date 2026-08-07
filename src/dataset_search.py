@@ -1,7 +1,7 @@
 import httpx
 import re
 from src.utils import setup_logger
-from config.settings import HTTP_TIMEOUT
+from config.settings import HTTP_TIMEOUT, YEARS, FILE_NAME_EXTENSION
 logger = setup_logger("DatasetSearch")
 
 class CKANSearcher:
@@ -13,7 +13,7 @@ class CKANSearcher:
     def search_datasets(self, query_text: str) -> dict[str, str]:
         """Busca paquetes y extrae los recursos CSV relevantes."""
         params = {"q": query_text}
-        logger.info("Consultando metadatos en la API de Datos Abiertos...")
+        logger.info(f"Consultando datasets desde {YEARS[0]} a {YEARS[-1]} en la API de Datos Abiertos...")
 
         try:
             with httpx.Client(timeout=HTTP_TIMEOUT, verify=False) as client:
@@ -31,14 +31,12 @@ class CKANSearcher:
                 match = re.search(r"(\d{4})", pkg["name"])
                 if match:
                     year = int(match.group(1))
-                    if 2013 <= year <= 2023 and url.endswith(".csv") and "nacimiento" in name:
-                        clean_name = f"{name.strip().replace(' ', '_')}.csv"
+                    if year in YEARS and url.endswith(FILE_NAME_EXTENSION) and "nacimiento" in name:
+                        clean_name = f"{name.strip().replace(' ', '_')}{FILE_NAME_EXTENSION}"
                         selected_resources[clean_name] = url
 
-            logger.info(f"Se seleccionaron {len(selected_resources)} datasets de la búsqueda.")
-            logger.info(f"Recursos seleccionados:")
-            for name in selected_resources:
-                logger.info(f" {name}")
+            logger.info(f"Se encontraron {len(selected_resources)} datasets de la búsqueda.")
+            #logger.info(f"Recursos seleccionados:")
             return selected_resources
 
         except Exception as e:
