@@ -1,6 +1,6 @@
 from pathlib import Path
 import httpx
-from config.settings import CHUNK_SIZE
+from config.settings import CHUNK_SIZE, HTTP_TIMEOUT
 from src.utils import setup_logger
 
 logger = setup_logger("Downloader")
@@ -14,11 +14,10 @@ class FileDownloader:
     def download(self, url: str, output_path: Path) -> None:
         """Descarga un archivo por bloques (Streaming). Idempotente."""
 
-        #logger.info(f"Verificando existencia de archivos...")
         if not output_path.exists():
             logger.info(f"El archivo '{output_path.name}' no existe. Iniciando descarga.")
             try:
-                        with httpx.stream("GET", url, verify=self.verify_ssl, follow_redirects=True, timeout=60.0) as resp:
+                        with httpx.stream("GET", url, verify=self.verify_ssl, follow_redirects=True, timeout=HTTP_TIMEOUT) as resp:
                             resp.raise_for_status()
                             with open(output_path, "wb") as f:
                                 for chunk in resp.iter_bytes(chunk_size=self.chunk_size):
@@ -31,5 +30,4 @@ class FileDownloader:
                             output_path.unlink()  # Limpiar archivo corrupto si falla
                         raise
         else:
-            #logger.info(f"El archivo '{output_path.name}' ya existe. Omitiendo.")
             return

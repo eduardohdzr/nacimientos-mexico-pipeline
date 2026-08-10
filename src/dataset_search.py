@@ -1,7 +1,7 @@
 import httpx
 import re
 from src.utils import setup_logger
-from config.settings import HTTP_TIMEOUT, YEARS, FILE_NAME_EXTENSION
+from config.settings import QUERY, HTTP_TIMEOUT, YEARS, FILE_NAME_EXTENSION
 logger = setup_logger("DatasetSearch")
 
 class CKANSearcher:
@@ -31,12 +31,11 @@ class CKANSearcher:
                 match = re.search(r"(\d{4})", pkg["name"])
                 if match:
                     year = int(match.group(1))
-                    if year in YEARS and url.endswith(FILE_NAME_EXTENSION) and "nacimiento" in name:
+                    if year in YEARS and url.endswith(FILE_NAME_EXTENSION) and QUERY in name:
                         clean_name = f"{name.strip().replace(' ', '_')}{FILE_NAME_EXTENSION}"
                         selected_resources[clean_name] = url
 
             logger.info(f"Se encontraron {len(selected_resources)} datasets.")
-            #logger.info(f"Recursos seleccionados:")
             return selected_resources
 
         except Exception as e:

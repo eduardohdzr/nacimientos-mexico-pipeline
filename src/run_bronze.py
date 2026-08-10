@@ -16,7 +16,6 @@ def run_bronze_pipeline():
 
     # Paso 2: Descargar los seleccionados
     downloader = FileDownloader(verify_ssl=False)
-    #logger.info(f"Verificando existencia de archivos en el Data Lake Store...")
 
     for file_name, url in target_files.items():
         destination = BRONZE_DIR / file_name

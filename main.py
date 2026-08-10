@@ -1,4 +1,4 @@
-from config.settings import BRONZE_DIR, TOTAL_FILES_EXPECTED, CURRENT_FILES
+from config.settings import TOTAL_FILES_EXPECTED, CURRENT_FILES
 from src.utils import setup_logger
 from src.run_bronze import run_bronze_pipeline
 
@@ -8,7 +8,6 @@ logger = setup_logger("Main")
 def main():
 
     # 1. ORQUESTACIÓN FASE 1 (BRONZE)
-    #if len(list(BRONZE_DIR.glob(f"*{FILE_NAME_EXTENSION}"))) < TOTAL_FILES_EXPECTED:
     if  CURRENT_FILES < TOTAL_FILES_EXPECTED:
         logger.info(f"Verificando existencia de datasets en el Data Lake Store...")
         logger.info(f"Archivos existentes: {CURRENT_FILES}/{TOTAL_FILES_EXPECTED}")
