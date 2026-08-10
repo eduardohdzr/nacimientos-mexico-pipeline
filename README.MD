@@ -27,6 +27,7 @@ El proyecto implementa un flujo **ELT (Extract, Load, Transform)** estructurado 
  └─ Consolidación y preparación para análisis/visualización
 ```
 ---
+
 ## 📂 Estructura del Proyecto
 
 ```text
@@ -47,6 +48,36 @@ nacimientos-mexico/
 ├── requirements.txt        # Dependencias del proyecto
 └── README.md               # Documentación del proyecto
 ```
+---
+## ⚙️ Funcionalidades Desarrolladas
+### 🥉 BRONZE
+
+En la **Capa Bronze**, se desarrolló la lógica de ingesta automatizada bajo el **principio de idempotencia**, enfocado en optimizar el uso de red, evitar descargas duplicadas y gestionar de forma eficiente la memoria:
+
+* **🔄 Orquestación e Ingesta Idempotente (`main.py` y `src/run_bronze.py`):**
+
+    * **Evaluación del estado local (`main.py`):** Antes de realizar conexiones o búsquedas en la API, el orquestador escanea el directorio local (`data/bronze/`) para verificar si los conjuntos de datos de los años objetivo (2013–2023) ya existen.
+
+    * **Flujo condicional y toma de decisiones:** 
+        * Si **todos** los archivos esperados están presentes, el orquestador omite la ejecución de la Capa Bronze y habilita el paso directo hacia la Capa Silver.
+
+        * Si **faltan** datasets por descargar, `main.py` invoca la ejecución del pipeline de Bronze (`src/run_bronze.py`), el cual calcula exactamente cuántos y cuáles archivos faltan para procesar únicamente los pendientes.
+
+* 🔍 **Búsqueda Dinámica en la API (`src/dataset_search.py`):**
+
+    * **Consulta por catálogo:** Interacción con el endpoint de la API REST de CKAN (`datos.gob.mx`) para consultar recursos de *"registro de nacimientos"*.
+
+    * **Filtrado dinámico:** Mapeo y extracción de URLs de descarga asociadas únicamente a los años pendientes por procesar.
+
+* 📥 **Descarga Eficiente por Streaming (`src/downloader.py`):**
+
+    * **Optimización de memoria I/O:** Procesamiento de descargas por bloques (`httpx.stream` en chunks de 8 KB), para prevenir la saturación de memoria RAM al descargar datasets de gran tamaño.
+
+* 🛠️ **Configuración Centralizada y Trazabilidad (`config/settings.py` y `src/utils.py`):**
+
+   * **Gestión de variables:** Parámetros del proyecto, rutas (`Path`), patrones de archivos y rangos de años centralizados en un solo punto.
+   * **Sistema de Logging:** Registro estructurado de eventos a nivel `INFO`, `WARNING` y `ERROR` para facilitar la auditoría y monitoreo de la ejecución.
+
 ---
 ## 🛠️ Tecnologías Utilizadas
 * **Lenguaje:** Python 3.14+
