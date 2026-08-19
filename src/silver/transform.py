@@ -2,6 +2,7 @@ import polars as pl
 from pathlib import Path
 from src.utils import setup_logger
 from config.settings import BRONZE_DIR, FILE_NAME_PATTERN
+import itertools
 
 logger = setup_logger("Transformer")
 
@@ -33,12 +34,39 @@ def extract_bronze_headers(input_path: str = BRONZE_DIR):
             schemas[year] = headers
             #logger.info(f'Nombre del archivo: {file_path.name}')
             #logger.info(schemas)
-            logger.info(f"Año {year}: {len(headers)} columnas detectadas.")
-            logger.info(f"Encabezados: {headers}")
+            #logger.info(f"Año {year}: {len(headers)} columnas detectadas.")
+            #logger.info(f"Año {year}: {headers}")
         except Exception as e:
             logger.error(f"Error al leer {file_path.name}: {e}")
 
     return schemas
+
+def extract_column_names(input_path: str = BRONZE_DIR):
+    names = []
+    path = Path(input_path)
+    files = sorted(path.glob(FILE_NAME_PATTERN.format(num="*")), key=lambda x: x.stem)
+
+    if not files:
+        logger.info(f"No se encontraron archivos en {input_path}. Asegúrese de que la fase de ingesta se haya completado correctamente.")
+        return
+
+    logger.info(f"Iniciando extracción de encabezados en {len(files)} archivos...")
+
+    for file_path in files:
+        try:
+            # scan_csv().columns accede solo al encabezado (Lazy Evaluation) [1, 2]
+            headers = pl.scan_csv(file_path).collect_schema().names()
+            names.append(headers)
+        except Exception as e:
+            logger.error(f"Error al leer {file_path.name}: {e}")
+    list_names = list(itertools.chain.from_iterable(names))  # Aplanamos la lista de listas
+    logger.info(f"Cantidad de encabezados extraídos: {len(list_names)}")
+    logger.info(f"Encabezados extraídos: {list_names}")
+    logger.info(f"Cantidad de encabezados únicos: {len(set(list_names))}")
+    logger.info(f"Encabezados únicos: {set(list_names)}")
+
+    return list_names
+
 
 def compare_schemas_names(schemas: dict):
     """

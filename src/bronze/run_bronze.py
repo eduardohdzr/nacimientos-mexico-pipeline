@@ -1,6 +1,6 @@
 from config.settings import API_ENDPOINT, QUERY, BRONZE_DIR
-from src.dataset_search import CKANSearcher
-from src.downloader import FileDownloader
+from .dataset_search import CKANSearcher
+from .downloader import FileDownloader
 
 from src.utils import setup_logger
 logger = setup_logger("BronzePipeline")
