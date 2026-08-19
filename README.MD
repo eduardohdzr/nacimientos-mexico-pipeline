@@ -33,20 +33,26 @@ El proyecto implementa un flujo **ELT (Extract, Load, Transform)** estructurado 
 ```text
 nacimientos-mexico/
 ├── data/
-│   ├── bronze/             # Datasets crudos (CSV) tal como se descargan de la API
-│   ├── silver/             # Datasets limpios y filtrados por año (Parquet)
-│   └── gold/               # Dataset consolidado final listo para producción
+│   ├── bronze/                 # Datasets crudos (CSV) tal como se descargan de la API
+│   ├── silver/                 # Datasets limpios (Parquet)
+│   └── gold/                   # Dataset consolidado final listo para producción
 ├── config/
-│   └── settings.py         # Configuración global (URLs, rutas locales, timeouts, etc)
+│   └── settings.py             # Configuración global (URLs, rutas locales, timeouts, etc)
 ├── src/
-│   ├── dataset_search.py   # Consulta a la API y filtrado dinámico de recursos
-│   ├── downloader.py       # Cliente HTTP para la descarga de archivos
-│   ├── run_bronze.py       # Orquestador del pipeline de la Capa Bronze
-│   └── utils.py            # Funciones auxiliares (manejo de logs, métricas, etc.)
-├── .gitignore              # Archivos omitidos en Git (data/, .venv/, .env, etc.)
-├── main.py                 # Orquestador principal y punto de entrada de la aplicación
-├── requirements.txt        # Dependencias del proyecto
-└── README.md               # Documentación del proyecto
+│   ├── __init__.py             # Paquete Python principal
+│   ├── bronze/                 # 🥉 Módulos de la CAPA BRONZE (Ingesta)
+│   │   ├── __init__.py
+│   │   ├── dataset_search.py   # Consulta a la API y filtrado dinámico de recursos
+│   │   ├── downloader.py       # Cliente HTTP para la descarga de archivos
+│   │   ├── run_bronze.py       # Orquestador del pipeline de la Capa Bronze
+│   ├── silver/                 # 🥈 Módulos de la CAPA SILVER (Limpieza y Transformación)
+│   │   ├── __init__.py
+│   │   ├── transform.py        # Extracción de nombres de columnas de datasets
+│   └── utils.py                # Funciones auxiliares (manejo de logs, métricas, etc.)
+├── .gitignore                  # Archivos omitidos en Git (data/, .venv/, .env, etc.)
+├── main.py                     # Orquestador principal y punto de entrada de la aplicación
+├── requirements.txt            # Dependencias del proyecto
+└── README.md                   # Documentación del proyecto
 ```
 ---
 ## ⚙️ Funcionalidades Desarrolladas
@@ -77,6 +83,9 @@ En la **Capa Bronze**, se desarrolló la lógica de ingesta automatizada bajo el
 
    * **Gestión de variables:** Parámetros del proyecto, rutas (`Path`), patrones de archivos y rangos de años centralizados en un solo punto.
    * **Sistema de Logging:** Registro estructurado de eventos a nivel `INFO`, `WARNING` y `ERROR` para facilitar la auditoría y monitoreo de la ejecución.
+
+### Estado de la Ingesta (Capa Bronze)
+> **Nota:** La API del portal de Datos Abiertos se encuentra temporalmente fuera de línea por mantenimiento/actualizaciones del portal gubernamental.
 
 ---
 ## 🛠️ Tecnologías Utilizadas
